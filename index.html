@@ -1,1 +1,29 @@
-test
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Textsport – Allsvenskan</title>
+</head>
+<body>
+  <h1>Allsvenskan Resultat</h1>
+  <pre id="output">Laddar matcher...</pre>
+
+  <script>
+    async function fetchMatches() {
+      const response = await fetch("https://v3.football.api-sports.io/fixtures?league=Allsvenskan_LIGA_ID&saison=2024", {
+        method: "GET",
+        headers: {
+          "x-apisports-key": "95bd691ff6msh0a8e38b57d5f6a2p1f920ejsn8665ad28b7f6"
+        }
+      });
+
+      const data = await response.json();
+      const output = document.getElementById("output");
+
+      output.textContent = JSON.stringify(data.response, null, 2);
+    }
+
+    fetchMatches();
+  </script>
+</body>
+</html>
