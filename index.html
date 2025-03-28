@@ -1,39 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>API Test</title>
+  <title>Textsport – Allsvenskan Tabell</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #000;
+      color: #0f0;
+      padding: 20px;
+    }
+    h1 {
+      color: #0ff;
+    }
+    pre {
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
-  <h1>API-Status från RapidAPI</h1>
-  <pre id="output">Hämtar...</pre>
+  <h1>ALLSVENSKAN 2023</h1>
+  <pre id="output">Laddar tabell...</pre>
 
   <script>
-    async function checkApiStatus() {
-      const output = document.getElementById("output");
+    async function fetchStandings() {
+      const output = document.getElementById('output');
 
       try {
-        const response = await fetch("https://v3.football.api-sports.io/status", {
-          method: "GET",
+        const response = await fetch('https://api-football-v1.p.rapidapi.com/v3/standings?season=2023&league=113', {
+          method: 'GET',
           headers: {
-            "x-rapidapi-key": "95bd691ff6msh0a8e38b57d5f6a2p1f920ejsn8665ad28b7f6",
-            "x-rapidapi-host": "v3.football.api-sports.io"
+            'x-rapidapi-host': 'api-football-v1.p.rapidapi.com',
+            'x-rapidapi-key': '95bd691ff6msh0a8e38b57d5f6a2p1f920ejsn8665ad28b7f6'
           }
         });
 
-        if (!response.ok) {
-          output.textContent = "Något gick fel: " + response.status;
-          return;
-        }
-
         const data = await response.json();
-        output.textContent = JSON.stringify(data, null, 2);
-      } catch (error) {
-        output.textContent = "Fel vid API-anropet: " + error;
+        const table = data.response[0].league.standings[0];
+
+        let text = "Pos  Lag                    M   V   O   F   GM  IM  +/-  P\n";
+        text += "------------------------------------------------------------\n";
+
+        table.forEach(team => {
+          const pos = String(team.rank).padEnd(4);
+          const name = team.team.name.padEnd(22).substring(0, 22);
+          const played = String(team.all.played).padStart(2);
+          const win = String(team.all.win).padStart(2);
+          const draw = String(team.all.draw).padStart(2);
+          const lose = String(team.all.lose).padStart(2);
+          const goalsFor = String(team.all.goals.for).padStart(3);
+          const goalsAgainst = String(team.all.goals.against).padStart(3);
+          const diff = String(team.goalsDiff).padStart(3);
+          const points = String(team.points).padStart(3);
+
+          text += `${pos}${name}${played}  ${win}  ${draw}  ${lose}  ${goalsFor}  ${goalsAgainst}  ${diff}  ${points}\n`;
+        });
+
+        output.textContent = text;
+      } catch (err) {
+        output.textContent = "Fel vid hämtning av tabell: " + err;
       }
     }
 
-    checkApiStatus();
+    fetchStandings();
   </script>
 </body>
 </html>
