@@ -2,28 +2,37 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Textsport – Allsvenskan</title>
+  <title>API Test</title>
 </head>
 <body>
-  <h1>Allsvenskan Resultat</h1>
-  <pre id="output">Laddar matcher...</pre>
+  <h1>API-Status</h1>
+  <pre id="output">Hämtar...</pre>
 
   <script>
-    async function fetchMatches() {
-      const response = await fetch("https://v3.football.api-sports.io/fixtures?league=29&season=2024", {
-        method: "GET",
-        headers: {
-          "x-apisports-key": "95bd691ff6msh0a8e38b57d5f6a2p1f920ejsn8665ad28b7f6"
-        }
-      });
-
-      const data = await response.json();
+    async function checkApiStatus() {
       const output = document.getElementById("output");
 
-      output.textContent = JSON.stringify(data.response, null, 2);
+      try {
+        const response = await fetch("https://v3.football.api-sports.io/status", {
+          method: "GET",
+          headers: {
+            "x-apisports-key": "DIN_API_NYCKEL_HÄR"
+          }
+        });
+
+        if (!response.ok) {
+          output.textContent = "Något gick fel: " + response.status;
+          return;
+        }
+
+        const data = await response.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        output.textContent = "Fel vid API-anropet: " + error;
+      }
     }
 
-    fetchMatches();
+    checkApiStatus();
   </script>
 </body>
 </html>
